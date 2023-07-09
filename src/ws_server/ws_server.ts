@@ -1,5 +1,6 @@
 import * as WebSocket from 'ws';
 import { handleRegistration } from '../requestHandlers/handleRegistration';
+import { giveRegResponse } from '../ws_server_responses/reg_response';
 
 export const wsServer = new WebSocket.Server({ noServer: true });
 
@@ -7,17 +8,12 @@ wsServer.on('connection', (ws) => {
   ws.on('message', (message) => {
     try {
       const request = JSON.parse(message.toString());
-      if (request.type === 'reg') {
-        const regResult = handleRegistration(
-          request.data.name,
-          request.data.password,
-        );
-        const response = {
-          type: 'reg',
-          data: JSON.stringify(regResult),
-          id: 0,
-        };
-        ws.send(JSON.stringify(response));
+      switch (request.type) {
+        case 'reg':
+          ws.send(giveRegResponse(request.data.name, request.data.password));
+          break;
+        default:
+          break;
       }
     } catch (error) {
       console.error('Error parsing message:', error);
