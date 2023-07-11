@@ -1,39 +1,33 @@
-import { users } from '../../dataBase';
-import { registrationAnswerInterface, userInterface } from '../../types';
+import { WebSocket } from 'ws';
+import { registrationResponseInterface } from '../../types';
+import { UserManager } from '../Classes/UserManager/UserManager';
 
 export const handleRegistration = (
   enteredName: string,
   enteredPassword: string,
-): registrationAnswerInterface => {
-  const existingUser = users.find(
-    (user: userInterface) => user.name === enteredName,
-  );
-  if (existingUser) {
-    if (existingUser.password === enteredPassword) {
-      return {
-        name: enteredName,
-        index: users.indexOf(existingUser),
-        error: false,
-        errorText: '',
-      };
+  currentWebsocket: WebSocket,
+): registrationResponseInterface => {
+  const userManager = UserManager.getInstance();
+  let user = userManager.getUser(enteredName);
+
+  if (user) {
+    if (userManager.checkPassword(user.id, enteredPassword)) {
+      userManager.updateUser(user.id, currentWebsocket);
     } else {
       return {
-        name: enteredName,
-        index: users.indexOf(existingUser),
+        name: user.name,
+        index: user.id,
         error: true,
         errorText: 'Incorrect password',
       };
     }
+  } else {
+    user = userManager.addUser(enteredName, enteredPassword, currentWebsocket);
   }
-  const newUser = {
-    name: enteredName,
-    password: enteredPassword,
-  };
-  users.push(newUser);
 
   return {
-    name: enteredName,
-    index: users.length - 1,
+    name: user.name,
+    index: user.id,
     error: false,
     errorText: '',
   };
