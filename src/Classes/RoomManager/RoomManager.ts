@@ -1,19 +1,44 @@
-import { GameRoomInterface } from '../types';
+import { GameRoomInterface, UserID } from '../types';
+import { WebSocket } from 'ws';
 
+//Singleton pattern
 export class RoomManager {
-  private _rooms: Array<GameRoomInterface> = [];
-  private static lastRoomId = 0;
+  private static instance: RoomManager;
 
-  public createRoom = (playerId: number) => {
+  private _rooms: Array<GameRoomInterface> = [];
+  private _lastRoomId = 1;
+
+  public static getInstance(): RoomManager {
+    if (!RoomManager.instance) {
+      RoomManager.instance = new RoomManager();
+    }
+
+    return RoomManager.instance;
+  }
+
+  public createRoom = (playerId: UserID): GameRoomInterface => {
     const newRoom = {
-      id: RoomManager.lastRoomId,
-      players: { player1Id: playerId, player2Id: -1 },
+      id: this._lastRoomId,
+      playersId: { player1Id: playerId, player2Id: null },
       gameData: { player1Ships: [], player2Ships: [] },
     };
 
     this._rooms.push(newRoom);
-    RoomManager.lastRoomId = RoomManager.lastRoomId + 1;
+    this._lastRoomId++;
+    return newRoom;
   };
+
+  public getRooms = () => {
+    return this._rooms;
+  };
+
+  public getSinglePlayerRooms = () => {
+    return this._rooms.filter(
+      (room: GameRoomInterface) =>
+        !!room.playersId.player1Id || !!room.playersId.player2Id,
+    );
+  };
+
   public getRoom = (roomId: number) => {};
   public addPlayersToRoom = (roomId: number) => {};
 }

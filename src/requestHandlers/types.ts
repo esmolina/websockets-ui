@@ -5,7 +5,7 @@ export interface registrationResponseInterface {
   errorText: string;
 }
 
-export interface updateRoomResponseInterface {
+export interface UpdateRoomsDataInterface {
   roomId: number;
   roomUsers: [
     {
@@ -13,4 +13,10 @@ export interface updateRoomResponseInterface {
       index: number;
     },
   ];
+}
+
+export interface ResponseInterface {
+  type: string;
+  data: string;
+  id: number;
 }

@@ -15,7 +15,7 @@ export interface ShipInterface {
 
 export interface GameRoomInterface {
   id: number;
-  players: { player1Id: number; player2Id: number };
+  playersId: { player1Id: UserID | null; player2Id: UserID | null };
   gameData: {
     player1Ships: Array<ShipInterface>;
     player2Ships: Array<ShipInterface>;

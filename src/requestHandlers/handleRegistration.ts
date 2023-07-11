@@ -1,5 +1,5 @@
 import { WebSocket } from 'ws';
-import { registrationResponseInterface } from '../../types';
+import { registrationResponseInterface } from './types';
 import { UserManager } from '../Classes/UserManager/UserManager';
 
 export const handleRegistration = (
@@ -8,7 +8,7 @@ export const handleRegistration = (
   currentWebsocket: WebSocket,
 ): registrationResponseInterface => {
   const userManager = UserManager.getInstance();
-  let user = userManager.getUser(enteredName);
+  let user = userManager.getUserByName(enteredName);
 
   if (user) {
     if (userManager.checkPassword(user.id, enteredPassword)) {

@@ -1,6 +1,6 @@
 import * as WebSocket from 'ws';
-import { handleRegistration } from '../requestHandlers/handleRegistration';
-import { giveRegResponse } from '../ws_server_responses/reg_response';
+import { giveRegResponse } from '../requestHandlers/giveRegResponse';
+import { handleCreateRoom } from '../requestHandlers/handleCreateRoom';
 
 export const wsServer = new WebSocket.Server({ noServer: true });
 
@@ -10,7 +10,11 @@ wsServer.on('connection', (ws) => {
       const request = JSON.parse(message.toString());
       switch (request.type) {
         case 'reg':
-          ws.send(giveRegResponse(request.data.name, request.data.password));
+          const requestData = JSON.parse(request.data.toString());
+          ws.send(giveRegResponse(requestData.name, requestData.password, ws));
+          break;
+        case 'create_room':
+          handleCreateRoom(ws);
           break;
         default:
           break;
