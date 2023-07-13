@@ -15,6 +15,16 @@ export interface UpdateRoomsDataInterface {
   ];
 }
 
+export interface CreateGameDataInterface {
+  roomId: number;
+  roomUsers: [
+    {
+      name: string;
+      index: number;
+    },
+  ];
+}
+
 export interface ResponseInterface {
   type: string;
   data: string;

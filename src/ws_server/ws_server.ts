@@ -1,6 +1,8 @@
 import * as WebSocket from 'ws';
 import { giveRegResponse } from '../requestHandlers/giveRegResponse';
 import { handleCreateRoom } from '../requestHandlers/handleCreateRoom';
+import { handleAddUserToRoom } from '../requestHandlers/handleAddUserToRoom';
+import { giveCreateGameResponse } from '../requestHandlers/giveCreateGameResponse';
 
 export const wsServer = new WebSocket.Server({ noServer: true });
 
@@ -15,6 +17,11 @@ wsServer.on('connection', (ws) => {
           break;
         case 'create_room':
           handleCreateRoom(ws);
+          break;
+        case 'add_user_to_room':
+          const requestRoomId = JSON.parse(request.data.toString()).indexRoom;
+          handleAddUserToRoom(requestRoomId, ws);
+          giveCreateGameResponse(requestRoomId);
           break;
         default:
           break;

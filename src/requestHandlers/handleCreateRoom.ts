@@ -9,6 +9,7 @@ export const handleCreateRoom = (ws: WebSocket) => {
   const user = userManager.getUserBySocket(ws);
 
   const newRoom = roomManager.createRoom(user!.id);
-  const updateRoomId = newRoom.id;
+  //ToDo
+  const updateRoomId = 0;
   handleUpdateRoom(updateRoomId);
 };

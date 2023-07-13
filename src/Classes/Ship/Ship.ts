@@ -1,35 +1,40 @@
 import { ShipInterface } from '../types';
 
-class Ship {
-  private _data: ShipInterface;
+class Ship implements ShipInterface {
+  size: number;
+  isVertical: boolean;
+  placement: { x: number; y: number };
+
   private _countDamaged: number = 0;
 
   constructor(size: number, verticalOrientation: boolean) {
-    this._data.size = size;
-    this._data.isVertical = verticalOrientation;
-    this._data.placement.x = -1;
-    this._data.placement.y = -1;
+    this.size = size;
+    this.isVertical = verticalOrientation;
+    this.placement.x = -1;
+    this.placement.y = -1;
   }
 
   public isPlaced = (): boolean => {
-    return this._data.placement.x !== -1 && this._data.placement.y !== -1;
+    return this.placement.x !== -1 && this.placement.y !== -1;
   };
+
   public isAffected = (x: number, y: number): boolean => {
-    if (this._data.isVertical) {
+    if (this.isVertical) {
       return (
-        x === this._data.placement.x &&
-        y <= this._data.placement.y &&
-        y >= this._data.placement.y - this._data.size
+        x === this.placement.x &&
+        y <= this.placement.y &&
+        y >= this.placement.y - this.size
       );
     } else {
       return (
-        y === this._data.placement.y &&
-        x >= this._data.placement.x &&
-        x <= this._data.placement.x + this._data.size
+        y === this.placement.y &&
+        x >= this.placement.x &&
+        x <= this.placement.x + this.size
       );
     }
   };
+
   public isDead = (): boolean => {
-    return this._data.size === this._countDamaged;
+    return this.size === this._countDamaged;
   };
 }
