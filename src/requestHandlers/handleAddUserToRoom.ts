@@ -15,7 +15,6 @@ export const handleAddUserToRoom = (
 
   const userId = user.id;
   roomManager.removeRoom(userId);
-  //ToDo remove number from handleUpdate - need sent all rooms
-  handleUpdateRoom(0);
+  handleUpdateRoom();
   roomManager.addToRoom(userId, requestRoomId);
 };

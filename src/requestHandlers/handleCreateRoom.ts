@@ -8,8 +8,6 @@ export const handleCreateRoom = (ws: WebSocket) => {
   const userManager = UserManager.getInstance();
   const user = userManager.getUserBySocket(ws);
 
-  const newRoom = roomManager.createRoom(user!.id);
-  //ToDo
-  const updateRoomId = 0;
-  handleUpdateRoom(updateRoomId);
+  roomManager.createRoom(user!.id);
+  handleUpdateRoom();
 };

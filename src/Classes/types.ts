@@ -33,3 +33,13 @@ export interface GameRoomInterface {
     turn: number;
   };
 }
+
+export interface UpdateRoomInterface {
+  roomId: number;
+  roomUsers: [
+    {
+      name: string;
+      index: UserID;
+    },
+  ];
+}

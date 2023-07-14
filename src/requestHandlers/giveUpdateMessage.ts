@@ -1,26 +1,35 @@
 import { ResponseInterface, UpdateRoomsDataInterface } from './types';
 import { UserManager } from '../Classes/UserManager/UserManager';
-import { UserID } from '../Classes/types';
+import { UpdateRoomInterface, UserID } from '../Classes/types';
+import { RoomManager } from '../Classes/RoomManager/RoomManager';
 
-export const giveUpdateMessage = (
-  roomId: number,
-  singlePlayerId: UserID,
-): ResponseInterface => {
+export const giveUpdateMessage = (): ResponseInterface => {
   const userManager = UserManager.getInstance();
+  const roomManager = RoomManager.getInstance();
+  const singlePlayerRooms = roomManager.getSinglePlayerRooms();
 
-  const updatedRoomData = {
-    roomId: roomId,
-    roomUsers: [
-      {
-        name: userManager.getUserNameById(singlePlayerId),
-        index: singlePlayerId,
-      },
-    ],
-  };
+  const singleRoomsList: Array<UpdateRoomInterface> = [];
+
+  singlePlayerRooms.forEach((room, roomId) => {
+    const singlePlayerIndex =
+      room.playersId.player1Id ?? room.playersId.player2Id;
+    if (singlePlayerIndex) {
+      const updatedRoomData: UpdateRoomInterface = {
+        roomId: roomId,
+        roomUsers: [
+          {
+            name: userManager.getUserNameById(singlePlayerIndex),
+            index: singlePlayerIndex,
+          },
+        ],
+      };
+      singleRoomsList.push(updatedRoomData);
+    }
+  });
 
   const updateMessage: ResponseInterface = {
     type: 'update_room',
-    data: JSON.stringify([updatedRoomData]),
+    data: JSON.stringify(singleRoomsList),
     id: 0,
   };
   return updateMessage;

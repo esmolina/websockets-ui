@@ -3,6 +3,7 @@ import { giveRegResponse } from '../requestHandlers/giveRegResponse';
 import { handleCreateRoom } from '../requestHandlers/handleCreateRoom';
 import { handleAddUserToRoom } from '../requestHandlers/handleAddUserToRoom';
 import { giveCreateGameResponse } from '../requestHandlers/giveCreateGameResponse';
+import { handleUpdateRoom } from '../requestHandlers/handleUpdateRoom';
 
 export const wsServer = new WebSocket.Server({ noServer: true });
 
@@ -14,6 +15,7 @@ wsServer.on('connection', (ws) => {
         case 'reg':
           const requestData = JSON.parse(request.data.toString());
           ws.send(giveRegResponse(requestData.name, requestData.password, ws));
+          handleUpdateRoom();
           break;
         case 'create_room':
           handleCreateRoom(ws);

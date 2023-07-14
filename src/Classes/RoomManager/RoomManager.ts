@@ -18,7 +18,7 @@ export class RoomManager {
     return RoomManager.instance;
   }
 
-  public createRoom = (playerId: UserID): GameRoomInterface => {
+  public createRoom = (playerId: UserID): void => {
     const newRoom = {
       playersId: { player1Id: playerId, player2Id: null },
       gameData: {
@@ -33,7 +33,6 @@ export class RoomManager {
     this._rooms.set(this._lastRoomId, newRoom);
     this._lastRoomId++;
     this._lastGameId++;
-    return newRoom;
   };
 
   public getSinglePlayerRooms = () => {
