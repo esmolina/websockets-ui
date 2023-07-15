@@ -11,7 +11,9 @@ export interface ShipInterface {
   placement: { x: number; y: number };
 
   isPlaced(): boolean;
+
   isAffected(x: number, y: number): boolean;
+
   isDead(): boolean;
 }
 
@@ -24,13 +26,18 @@ export enum GameState {
 }
 
 export interface GameRoomInterface {
-  playersId: { player1Id: UserID | null; player2Id: UserID | null };
+  playersId: {
+    player1Id: UserID | null;
+    player2Id: UserID | null;
+    [key: string]: any;
+  };
   gameData: {
     gameId: number;
     state: GameState;
     player1Ships: Array<ShipInterface>;
     player2Ships: Array<ShipInterface>;
     turn: number;
+    [key: string]: any;
   };
 }
 

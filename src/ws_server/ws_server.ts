@@ -4,6 +4,7 @@ import { handleCreateRoom } from '../requestHandlers/handleCreateRoom';
 import { handleAddUserToRoom } from '../requestHandlers/handleAddUserToRoom';
 import { giveCreateGameResponse } from '../requestHandlers/giveCreateGameResponse';
 import { handleUpdateRoom } from '../requestHandlers/handleUpdateRoom';
+import { handleAddShips } from '../requestHandlers/handleAddShips';
 
 export const wsServer = new WebSocket.Server({ noServer: true });
 
@@ -24,6 +25,10 @@ wsServer.on('connection', (ws) => {
           const requestRoomId = JSON.parse(request.data.toString()).indexRoom;
           handleAddUserToRoom(requestRoomId, ws);
           giveCreateGameResponse(requestRoomId);
+          break;
+        case 'add_ships':
+          const shipsData = JSON.parse(request.data.toString());
+          handleAddShips(shipsData, ws);
           break;
         default:
           break;

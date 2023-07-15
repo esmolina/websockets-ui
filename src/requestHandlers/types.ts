@@ -1,3 +1,5 @@
+import { UserID } from '../Classes/types';
+
 export interface registrationResponseInterface {
   name: string;
   index: number;
@@ -23,6 +25,22 @@ export interface CreateGameDataInterface {
       index: number;
     },
   ];
+}
+
+export interface RequestAddShipsDataInterface {
+  gameId: number;
+  ships: [
+    {
+      position: {
+        x: number;
+        y: number;
+      };
+      direction: boolean;
+      length: number;
+      type: 'small' | 'medium' | 'large' | 'huge';
+    },
+  ];
+  indexPlayer: UserID;
 }
 
 export interface ResponseInterface {

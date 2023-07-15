@@ -1,17 +1,24 @@
 import { ShipInterface } from '../types';
 
-class Ship implements ShipInterface {
+export class Ship implements ShipInterface {
   size: number;
   isVertical: boolean;
   placement: { x: number; y: number };
 
   private _countDamaged: number = 0;
 
-  constructor(size: number, verticalOrientation: boolean) {
+  constructor(
+    size: number,
+    verticalOrientation: boolean,
+    positionX: number,
+    positionY: number,
+  ) {
     this.size = size;
     this.isVertical = verticalOrientation;
-    this.placement.x = -1;
-    this.placement.y = -1;
+    this.placement = {
+      x: positionX,
+      y: positionY,
+    };
   }
 
   public isPlaced = (): boolean => {

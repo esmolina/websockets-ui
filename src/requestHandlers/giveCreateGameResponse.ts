@@ -34,6 +34,6 @@ export const giveCreateGameResponse = (requestRoomId: number) => {
   const player2WS = userManager.getSocket(player2ID);
 
   if (!player1WS || !player2WS) return;
-  player1WS.send(JSON.stringify(createGameData(gameId, player2ID)));
-  player2WS.send(JSON.stringify(createGameData(gameId, player1ID)));
+  player1WS.send(JSON.stringify(createGameData(gameId, player1ID)));
+  player2WS.send(JSON.stringify(createGameData(gameId, player2ID)));
 };
