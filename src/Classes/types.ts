@@ -49,24 +49,6 @@ export interface GameRoomInterface {
   };
 }
 
-// export interface GameRoomInterface {
-//   playersId: {
-//     player1Id: UserID | null;
-//     player2Id: UserID | null;
-//     [key: string]: any;
-//   };
-//   gameData: {
-//     gameId: number;
-//     state: GameState;
-//     player1Ships: Array<ShipInterface>;
-//     player2Ships: Array<ShipInterface>;
-//     turn: number;
-//     [key: string]: any;
-//   };
-//   player1ShootsMap: Array<Array<boolean>>;
-//   player2ShootsMap: Array<Array<boolean>>;
-// }
-
 export interface UpdateRoomInterface {
   roomId: number;
   roomUsers: [

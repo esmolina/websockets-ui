@@ -211,13 +211,15 @@ export class RoomManager {
     const whoseShipsAreAttacked =
       room.players.player1?.playerId === indexPlayer ? 'player2' : 'player1';
 
+    if (room.players[whoseShipsAreAttacked]?.shootsMap[attackX][attackY]) {
+      return;
+    }
+
     let result = AttackResult.Miss;
     room.players[whoseShipsAreAttacked]?.ships.forEach((ship) => {
       const isHurt = ship.isAffected(attackX, attackY);
       if (isHurt) {
-        if (!room.players[whoseShipsAreAttacked]?.shootsMap[attackX][attackY]) {
-          ship.increaseDamage();
-        }
+        ship.increaseDamage();
         if (ship.isDead()) {
           this._lastKilledShip = ship;
           ship.getSurroundWater().forEach((coords) => {
