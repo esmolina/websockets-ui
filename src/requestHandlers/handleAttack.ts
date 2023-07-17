@@ -5,6 +5,10 @@ import { AttackResult, UserID } from '../Classes/types';
 import { giveTurnResponse } from './giveTurnResponse';
 import { getPlayersSockets } from './getPlayersSockets';
 import { giveAttackResponse } from './giveAttackResponse';
+import { giveFinishResponse } from './giveFinishResponse';
+import { handleUpdateRoom } from './handleUpdateRoom';
+import { giveUpdateWinnersMessage } from './giveUpdateWinnersMessage';
+import { giveNewWinMessage } from './giveNewWinMessage';
 
 export const handleAttack = (
   x: number,
@@ -75,7 +79,16 @@ export const handleAttack = (
         gameId,
         indexPlayer,
       );
-      //ToDo add finish game
+      if (isAllEnemyKilled) {
+        const finishMassage = giveFinishResponse(indexPlayer);
+        sockets.forEach((ws) => {
+          ws.send(JSON.stringify(finishMassage));
+        });
+        roomManager.removeRoom(indexPlayer);
+        handleUpdateRoom();
+        roomManager.updateWins(indexPlayer);
+        giveNewWinMessage(indexPlayer);
+      }
       break;
     default:
       break;

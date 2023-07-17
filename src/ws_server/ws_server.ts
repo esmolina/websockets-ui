@@ -7,6 +7,7 @@ import { handleUpdateRoom } from '../requestHandlers/handleUpdateRoom';
 import { handleAddShips } from '../requestHandlers/handleAddShips';
 import { handleAttack } from '../requestHandlers/handleAttack';
 import { handleRandomAttack } from '../requestHandlers/handleRandomAttack';
+import { giveUpdateWinnersMessage } from '../requestHandlers/giveUpdateWinnersMessage';
 
 export const wsServer = new WebSocket.Server({ noServer: true });
 

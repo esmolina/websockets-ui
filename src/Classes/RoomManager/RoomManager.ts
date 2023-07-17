@@ -9,21 +9,7 @@ import {
 import { RequestAddShipsDataInterface } from '../../requestHandlers/types';
 import { Ship } from '../Ship/Ship';
 import { removeItemFromMapByValue } from '../helpers';
-import { FIELD_HEIGHT, FIELD_WIDTH } from '../../Constants';
-
-const buildMap = (): Array<Array<boolean>> => {
-  const result: Array<Array<boolean>> = [];
-
-  for (let x = 0; x < FIELD_WIDTH; x++) {
-    const line: Array<boolean> = [];
-    for (let y = 0; y < FIELD_HEIGHT; y++) {
-      line.push(false);
-    }
-    result.push(line);
-  }
-
-  return result;
-};
+import { buildMap } from '../helpers';
 
 //Singleton pattern
 export class RoomManager {
@@ -32,7 +18,7 @@ export class RoomManager {
   private _rooms: Map<number, GameRoomInterface> = new Map(); // rooms Map ([key: room.id, value: roomData], ...)
   private _usersRooms: Map<UserID, number> = new Map(); // // roomsId Map ([key: user.id, value: room.id], ...)
   private _games: Map<number, number> = new Map(); // // roomsId Map ([key: gameId, value: room.id], ...)
-  private _winners: Map<string, number> = new Map(); // winners Map ([key: user.name, value: number of wins], ...)
+  private _winners: Map<UserID, number> = new Map(); // winners Map ([key: userId, value: number of wins], ...)
   private _lastRoomId = 1;
   private _lastGameId = 1;
   private _lastKilledShip: ShipInterface | null = null;
@@ -287,5 +273,23 @@ export class RoomManager {
     const whoseShipsAreAttacked =
       room.players.player1?.playerId === playerId ? 'player2' : 'player1';
     return !room.players[whoseShipsAreAttacked]?.shootsMap[x][y];
+  };
+
+  public updateWins = (playerId: UserID) => {
+    const wins = this._winners.get(playerId);
+
+    if (wins) {
+      this._winners.set(playerId, wins + 1);
+    } else {
+      this._winners.set(playerId, 1);
+    }
+  };
+
+  public giveWinners = (): Map<UserID, number> => {
+    return this._winners;
+  };
+
+  public getPlayerWins = (player: UserID): number | undefined => {
+    return this._winners.get(player);
   };
 }
