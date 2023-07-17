@@ -1,14 +1,16 @@
 import { AttackRequestDataInterface } from './types';
 import { WebSocket } from 'ws';
 import { RoomManager } from '../Classes/RoomManager/RoomManager';
-import { AttackResult } from '../Classes/types';
+import { AttackResult, UserID } from '../Classes/types';
 import { giveTurnResponse } from './giveTurnResponse';
 import { getPlayersSockets } from './getPlayersSockets';
 import { giveAttackResponse } from './giveAttackResponse';
 
 export const handleAttack = (
-  { x, y, gameId, indexPlayer }: AttackRequestDataInterface,
-  ws: WebSocket,
+  x: number,
+  y: number,
+  gameId: number,
+  indexPlayer: UserID,
 ) => {
   const roomManager = RoomManager.getInstance();
 

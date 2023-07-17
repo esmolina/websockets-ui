@@ -6,6 +6,7 @@ import { giveCreateGameResponse } from '../requestHandlers/giveCreateGameRespons
 import { handleUpdateRoom } from '../requestHandlers/handleUpdateRoom';
 import { handleAddShips } from '../requestHandlers/handleAddShips';
 import { handleAttack } from '../requestHandlers/handleAttack';
+import { handleRandomAttack } from '../requestHandlers/handleRandomAttack';
 
 export const wsServer = new WebSocket.Server({ noServer: true });
 
@@ -33,7 +34,12 @@ wsServer.on('connection', (ws) => {
           break;
         case 'attack':
           const attackData = JSON.parse(request.data.toString());
-          handleAttack(attackData, ws);
+          handleAttack(
+            attackData.x,
+            attackData.y,
+            attackData.gameId,
+            attackData.indexPlayer,
+          );
           break;
         case 'randomAttack':
           const randomAttackData = JSON.parse(request.data.toString());

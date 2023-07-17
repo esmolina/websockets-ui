@@ -273,4 +273,17 @@ export class RoomManager {
     if (!room) return;
     return playerId === room.turn;
   };
+
+  public isAvailableForShoot = (
+    playerId: UserID,
+    gameId: number,
+    x: number,
+    y: number,
+  ): boolean => {
+    const room = this.getRoomDataByGameId(gameId);
+    if (!room) return false;
+    const whoseShipsAreAttacked =
+      room.players.player1?.playerId === playerId ? 'player2' : 'player1';
+    return !room.players[whoseShipsAreAttacked]?.shootsMap[x][y];
+  };
 }
