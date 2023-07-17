@@ -1,4 +1,5 @@
 import { ShipInterface, SurroundWaterInterface } from '../types';
+import { FIELD_HEIGHT, FIELD_WIDTH } from '../../Constants';
 
 export class Ship implements ShipInterface {
   size: number;
@@ -54,17 +55,29 @@ export class Ship implements ShipInterface {
     const size = this.size;
     const shipX = this.placement.x;
     const shipY = this.placement.y;
-
+    let calculatedX = 0;
+    let calculatedY = 0;
     for (let shortSide = -1; shortSide <= 1; shortSide++) {
       for (let longSide = -1; longSide < size + 1; longSide++) {
         if (shortSide === 0 && longSide >= 0 && longSide < size) {
           continue;
         }
         if (this.isVertical) {
-          surroundWaters.push({ x: shipX + shortSide, y: shipY + longSide });
+          calculatedX = shipX + shortSide;
+          calculatedY = shipY + longSide;
         } else {
-          surroundWaters.push({ x: shipX + longSide, y: shipY + shortSide });
+          calculatedX = shipX + longSide;
+          calculatedY = shipY + shortSide;
         }
+        if (
+          calculatedX < 0 ||
+          calculatedX >= FIELD_WIDTH ||
+          calculatedY < 0 ||
+          calculatedY >= FIELD_HEIGHT
+        ) {
+          continue;
+        }
+        surroundWaters.push({ x: calculatedX, y: calculatedY });
       }
     }
 

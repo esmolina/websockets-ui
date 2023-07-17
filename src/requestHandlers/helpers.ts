@@ -9,3 +9,7 @@ export const giveShipType = (size: number): string => {
     return 'huge';
   }
 };
+
+export const getRandom = (max: number): number => {
+  return Math.floor(Math.random() * max);
+};

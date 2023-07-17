@@ -35,6 +35,13 @@ wsServer.on('connection', (ws) => {
           const attackData = JSON.parse(request.data.toString());
           handleAttack(attackData, ws);
           break;
+        case 'randomAttack':
+          const randomAttackData = JSON.parse(request.data.toString());
+          handleRandomAttack(
+            randomAttackData.gameId,
+            randomAttackData.indexPlayer,
+          );
+          break;
         default:
           break;
       }

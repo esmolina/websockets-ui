@@ -9,13 +9,14 @@ import {
 import { RequestAddShipsDataInterface } from '../../requestHandlers/types';
 import { Ship } from '../Ship/Ship';
 import { removeItemFromMapByValue } from '../helpers';
+import { FIELD_HEIGHT, FIELD_WIDTH } from '../../Constants';
 
 const buildMap = (): Array<Array<boolean>> => {
   const result: Array<Array<boolean>> = [];
 
-  for (let x = 0; x < 10; x++) {
+  for (let x = 0; x < FIELD_WIDTH; x++) {
     const line: Array<boolean> = [];
-    for (let y = 0; y < 10; y++) {
+    for (let y = 0; y < FIELD_HEIGHT; y++) {
       line.push(false);
     }
     result.push(line);
@@ -219,6 +220,11 @@ export class RoomManager {
         }
         if (ship.isDead()) {
           this._lastKilledShip = ship;
+          ship.getSurroundWater().forEach((coords) => {
+            room.players[whoseShipsAreAttacked]!.shootsMap[coords.x][coords.y] =
+              true;
+          });
+
           result = AttackResult.Killed;
         } else {
           result = AttackResult.Shot;
