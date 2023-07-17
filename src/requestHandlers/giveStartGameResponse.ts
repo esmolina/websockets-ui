@@ -7,13 +7,12 @@ import { giveShipsData } from './giveShipsData';
 const giveStartMessage = (
   room: GameRoomInterface,
   player: string,
-  shipsSetName: string,
 ): ResponseInterface => {
-  const shipSet = giveShipsData(room, player, shipsSetName);
+  const shipSet = giveShipsData(room, player);
 
   const startGameData = {
     ships: shipSet,
-    currentPlayerIndex: room.playersId[player],
+    currentPlayerIndex: room.players[player].playerId,
   };
   const startGameMessage = {
     type: 'start_game',
@@ -29,22 +28,19 @@ export const giveStartGameResponse = (gameId: number) => {
   const room = roomManager.getRoomDataByGameId(gameId);
 
   if (!room) return;
-  const firstPlayerMessage = giveStartMessage(
-    room,
-    'player1Id',
-    'player1Ships',
-  );
-  if (!room.playersId.player1Id || !room.playersId.player2Id) return;
+  const firstPlayerMessage = giveStartMessage(room, 'player1');
+  if (!room.players.player1?.playerId || !room.players.player2?.playerId)
+    return;
 
-  const firstPlayerSocket = userManager.getSocket(room.playersId.player1Id);
-  const secondPlayerSocket = userManager.getSocket(room.playersId.player2Id);
+  const firstPlayerSocket = userManager.getSocket(
+    room.players.player1.playerId,
+  );
+  const secondPlayerSocket = userManager.getSocket(
+    room.players.player2.playerId,
+  );
   if (!firstPlayerSocket || !secondPlayerSocket) return;
   firstPlayerSocket.send(JSON.stringify(firstPlayerMessage));
 
-  const secondPlayerMessage = giveStartMessage(
-    room,
-    'player2Id',
-    'player2Ships',
-  );
+  const secondPlayerMessage = giveStartMessage(room, 'player2');
   secondPlayerSocket.send(JSON.stringify(secondPlayerMessage));
 };

@@ -1,7 +1,28 @@
-import { GameRoomInterface, GameState, UserID } from '../types';
+import {
+  AttackResult,
+  GameRoomInterface,
+  GameState,
+  ShipInterface,
+  SurroundWaterInterface,
+  UserID,
+} from '../types';
 import { RequestAddShipsDataInterface } from '../../requestHandlers/types';
 import { Ship } from '../Ship/Ship';
 import { removeItemFromMapByValue } from '../helpers';
+
+const buildMap = (): Array<Array<boolean>> => {
+  const result: Array<Array<boolean>> = [];
+
+  for (let x = 0; x < 10; x++) {
+    const line: Array<boolean> = [];
+    for (let y = 0; y < 10; y++) {
+      line.push(false);
+    }
+    result.push(line);
+  }
+
+  return result;
+};
 
 //Singleton pattern
 export class RoomManager {
@@ -13,6 +34,7 @@ export class RoomManager {
   private _winners: Map<string, number> = new Map(); // winners Map ([key: user.name, value: number of wins], ...)
   private _lastRoomId = 1;
   private _lastGameId = 1;
+  private _lastKilledShip: ShipInterface | null = null;
 
   public static getInstance(): RoomManager {
     if (!RoomManager.instance) {
@@ -24,13 +46,16 @@ export class RoomManager {
 
   public createRoom = (playerId: UserID): void => {
     const newRoom = {
-      playersId: { player1Id: playerId, player2Id: null },
-      gameData: {
-        gameId: this._lastGameId,
-        state: GameState.SingleUser,
-        player1Ships: [],
-        player2Ships: [],
-        turn: 0,
+      gameId: this._lastGameId,
+      state: GameState.SingleUser,
+      turn: 0,
+      players: {
+        player1: {
+          playerId: playerId,
+          ships: [],
+          shootsMap: buildMap(),
+        },
+        player2: null,
       },
     };
 
@@ -67,7 +92,7 @@ export class RoomManager {
     const singlePlayerRooms = new Map(
       [...this._rooms].filter(
         ([roomId, roomData]) =>
-          !!roomData.playersId.player1Id || !!roomData.playersId.player2Id,
+          !!roomData.players.player1 || !!roomData.players.player2,
       ),
     );
     return singlePlayerRooms;
@@ -92,14 +117,18 @@ export class RoomManager {
     const room = this._rooms.get(requestRoomId);
 
     if (room) {
-      room.playersId.player2Id = userId;
-      room.gameData.state = GameState.TwoUsers;
+      room.players.player2 = {
+        playerId: userId,
+        ships: [],
+        shootsMap: buildMap(),
+      };
+      room.state = GameState.TwoUsers;
     }
   };
 
   public getGameId = (roomId: number): number | undefined => {
     const room = this._rooms.get(roomId);
-    const gameId = room?.gameData.gameId;
+    const gameId = room?.gameId;
     return gameId;
   };
 
@@ -107,12 +136,12 @@ export class RoomManager {
     const playersId: Array<UserID> = [];
 
     for (const room of this._rooms.values()) {
-      if (room.gameData.gameId === gameId) {
-        if (room.playersId.player1Id) {
-          playersId.push(room.playersId.player1Id);
+      if (room.gameId === gameId) {
+        if (room.players.player1) {
+          playersId.push(room.players.player1.playerId);
         }
-        if (room.playersId.player2Id) {
-          playersId.push(room.playersId.player2Id);
+        if (room.players.player2) {
+          playersId.push(room.players.player2.playerId);
         }
       }
     }
@@ -127,7 +156,7 @@ export class RoomManager {
 
     if (room) {
       const whichPlayerShips: string =
-        userId === room.playersId.player1Id ? 'player1Ships' : 'player2Ships';
+        userId === room.players.player1?.playerId ? 'player1' : 'player2';
       shipsData.ships.forEach((shipData) => {
         const parsedData = JSON.parse(JSON.stringify(shipData));
         const newShip = new Ship(
@@ -136,7 +165,7 @@ export class RoomManager {
           parsedData.position.x,
           parsedData.position.y,
         );
-        room.gameData[whichPlayerShips].push(newShip);
+        room.players[whichPlayerShips].ships.push(newShip);
       });
     }
   };
@@ -147,11 +176,11 @@ export class RoomManager {
       throw Error;
     }
     const isBothPlaced =
-      !!room.gameData.player1Ships.length &&
-      !!room.gameData.player2Ships.length;
+      !!room.players.player1?.ships.length &&
+      !!room.players.player2?.ships.length;
 
     if (isBothPlaced) {
-      room.gameData.state = GameState.Game;
+      room.state = GameState.Game;
     }
     return isBothPlaced;
   };
@@ -162,11 +191,80 @@ export class RoomManager {
       throw Error;
     }
 
-    room.gameData.turn = userId;
+    room.turn = userId;
   };
 
   public getTurn = (roomId: number): UserID | number => {
     const room = this._rooms.get(roomId);
-    return room!.gameData.turn;
+    return room!.turn;
+  };
+
+  public checkAttackResult = (
+    attackX: number,
+    attackY: number,
+    gameId: number,
+    indexPlayer: UserID,
+  ): string | undefined => {
+    const room = this.getRoomDataByGameId(gameId);
+    if (!room) return;
+    const whoseShipsAreAttacked =
+      room.players.player1?.playerId === indexPlayer ? 'player2' : 'player1';
+
+    let result = AttackResult.Miss;
+    room.players[whoseShipsAreAttacked]?.ships.forEach((ship) => {
+      const isHurt = ship.isAffected(attackX, attackY);
+      if (isHurt) {
+        if (!room.players[whoseShipsAreAttacked]?.shootsMap[attackX][attackY]) {
+          ship.increaseDamage();
+        }
+        if (ship.isDead()) {
+          this._lastKilledShip = ship;
+          result = AttackResult.Killed;
+        } else {
+          result = AttackResult.Shot;
+        }
+      }
+    });
+
+    room.players[whoseShipsAreAttacked]!.shootsMap[attackX][attackY] = true;
+    return result;
+  };
+
+  public checkIsAllEnemyKilled = (gameId: number, indexPlayer: UserID) => {
+    const room = this.getRoomDataByGameId(gameId);
+    if (!room) return;
+    const whoseShipsAreAttacked =
+      room.players.player1?.playerId === indexPlayer ? 'player2' : 'player1';
+    return room.players[whoseShipsAreAttacked]?.ships.every((ship) =>
+      ship.isDead(),
+    );
+  };
+
+  public getSurroundWater = (): Array<SurroundWaterInterface> => {
+    if (!this._lastKilledShip) return [];
+
+    return this._lastKilledShip.getSurroundWater();
+  };
+
+  public getEnemyPlayerId = (
+    gameId: number,
+    ownId: UserID,
+  ): UserID | null | undefined => {
+    const room = this.getRoomDataByGameId(gameId);
+    if (!room) return;
+    const whoIsEnemy =
+      room.players.player1?.playerId === ownId
+        ? room.players.player2?.playerId
+        : room.players.player1?.playerId;
+    return whoIsEnemy;
+  };
+
+  public mayPlayerShoot = (
+    gameId: number,
+    playerId: UserID,
+  ): boolean | void => {
+    const room = this.getRoomDataByGameId(gameId);
+    if (!room) return;
+    return playerId === room.turn;
   };
 }

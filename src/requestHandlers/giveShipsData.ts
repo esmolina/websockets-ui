@@ -1,13 +1,13 @@
 import { GameRoomInterface, ShipInterface } from '../Classes/types';
 import { giveShipType } from './helpers';
+import { ResponseAddShipsDataInterface } from './types';
 
 export const giveShipsData = (
   room: GameRoomInterface,
   player: string,
-  shipsSetName: string,
-): Array<string> => {
-  const shipSet: Array<string> = [];
-  const shipsData: Array<ShipInterface> = room.gameData[shipsSetName];
+): Array<ResponseAddShipsDataInterface> => {
+  const shipSet: Array<ResponseAddShipsDataInterface> = [];
+  const shipsData: Array<ShipInterface> = room.players[player].ships;
   shipsData.forEach((data) => {
     const ship = {
       position: {
@@ -18,7 +18,7 @@ export const giveShipsData = (
       length: data.size,
       type: giveShipType(data.size),
     };
-    shipSet.push(JSON.stringify(ship));
+    shipSet.push(ship);
   });
   return shipSet;
 };

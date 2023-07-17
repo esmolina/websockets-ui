@@ -12,7 +12,7 @@ export const giveUpdateMessage = (): ResponseInterface => {
 
   singlePlayerRooms.forEach((room, roomId) => {
     const singlePlayerIndex =
-      room.playersId.player1Id ?? room.playersId.player2Id;
+      room.players.player1?.playerId ?? room.players.player2?.playerId;
     if (singlePlayerIndex) {
       const updatedRoomData: UpdateRoomInterface = {
         roomId: roomId,

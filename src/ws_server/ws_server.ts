@@ -5,6 +5,7 @@ import { handleAddUserToRoom } from '../requestHandlers/handleAddUserToRoom';
 import { giveCreateGameResponse } from '../requestHandlers/giveCreateGameResponse';
 import { handleUpdateRoom } from '../requestHandlers/handleUpdateRoom';
 import { handleAddShips } from '../requestHandlers/handleAddShips';
+import { handleAttack } from '../requestHandlers/handleAttack';
 
 export const wsServer = new WebSocket.Server({ noServer: true });
 
@@ -29,6 +30,10 @@ wsServer.on('connection', (ws) => {
         case 'add_ships':
           const shipsData = JSON.parse(request.data.toString());
           handleAddShips(shipsData, ws);
+          break;
+        case 'attack':
+          const attackData = JSON.parse(request.data.toString());
+          handleAttack(attackData, ws);
           break;
         default:
           break;

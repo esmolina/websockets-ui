@@ -1,4 +1,4 @@
-import { ShipInterface } from '../types';
+import { ShipInterface, SurroundWaterInterface } from '../types';
 
 export class Ship implements ShipInterface {
   size: number;
@@ -29,19 +29,45 @@ export class Ship implements ShipInterface {
     if (this.isVertical) {
       return (
         x === this.placement.x &&
-        y <= this.placement.y &&
-        y >= this.placement.y - this.size
+        y >= this.placement.y &&
+        y < this.placement.y + this.size
       );
     } else {
       return (
         y === this.placement.y &&
         x >= this.placement.x &&
-        x <= this.placement.x + this.size
+        x < this.placement.x + this.size
       );
     }
   };
 
   public isDead = (): boolean => {
     return this.size === this._countDamaged;
+  };
+
+  public increaseDamage = (): void => {
+    this._countDamaged++;
+  };
+
+  public getSurroundWater = (): Array<SurroundWaterInterface> => {
+    const surroundWaters: Array<SurroundWaterInterface> = [];
+    const size = this.size;
+    const shipX = this.placement.x;
+    const shipY = this.placement.y;
+
+    for (let shortSide = -1; shortSide <= 1; shortSide++) {
+      for (let longSide = -1; longSide < size + 1; longSide++) {
+        if (shortSide === 0 && longSide >= 0 && longSide < size) {
+          continue;
+        }
+        if (this.isVertical) {
+          surroundWaters.push({ x: shipX + shortSide, y: shipY + longSide });
+        } else {
+          surroundWaters.push({ x: shipX + longSide, y: shipY + shortSide });
+        }
+      }
+    }
+
+    return surroundWaters;
   };
 }

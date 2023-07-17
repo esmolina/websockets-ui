@@ -43,6 +43,32 @@ export interface RequestAddShipsDataInterface {
   indexPlayer: UserID;
 }
 
+export interface ResponseAddShipsDataInterface {
+  position: {
+    x: number;
+    y: number;
+  };
+  direction: boolean;
+  length: number;
+  type: string;
+}
+
+export interface AttackRequestDataInterface {
+  gameId: number;
+  x: number;
+  y: number;
+  indexPlayer: number;
+}
+
+export interface AttackResponseDataInterface {
+  position: {
+    x: number;
+    y: number;
+  };
+  currentPlayer: UserID;
+  status: 'miss' | 'killed' | 'shot';
+}
+
 export interface ResponseInterface {
   type: string;
   data: string;
