@@ -8,6 +8,26 @@ export const handleRegistration = (
   currentWebsocket: WebSocket,
 ): registrationResponseInterface => {
   const userManager = UserManager.getInstance();
+
+  // reg.data verification
+  if (enteredName.length < 5) {
+    return {
+      name: '',
+      index: -1,
+      error: true,
+      errorText: 'Name should be at least 5 characters long',
+    };
+  }
+
+  if (enteredPassword.length < 5) {
+    return {
+      name: '',
+      index: -1,
+      error: true,
+      errorText: 'Password should be at least 5 characters long',
+    };
+  }
+
   let user = userManager.getUserByName(enteredName);
 
   if (user) {
