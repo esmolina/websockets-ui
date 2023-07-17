@@ -9,6 +9,7 @@ import { giveFinishResponse } from './giveFinishResponse';
 import { handleUpdateRoom } from './handleUpdateRoom';
 import { giveUpdateWinnersMessage } from './giveUpdateWinnersMessage';
 import { giveNewWinMessage } from './giveNewWinMessage';
+import { handleDisconnect } from './handleDisconnect';
 
 export const handleAttack = (
   x: number,
@@ -17,6 +18,8 @@ export const handleAttack = (
   indexPlayer: UserID,
 ) => {
   const roomManager = RoomManager.getInstance();
+
+  setTimeout(handleDisconnect, 25000);
 
   const sockets = getPlayersSockets(gameId);
   const isPlayerCanShoot = roomManager.mayPlayerShoot(gameId, indexPlayer);
@@ -87,7 +90,7 @@ export const handleAttack = (
         roomManager.removeRoom(indexPlayer);
         handleUpdateRoom();
         roomManager.updateWins(indexPlayer);
-        giveNewWinMessage(indexPlayer);
+        giveUpdateWinnersMessage();
       }
       break;
     default:
